@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx
+  namespace: default
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      k8s-app: nginx
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        k8s-app: nginx
+      name: nginx
+    spec:
+      containers:
+      - image: vvrr174/my-nginx-pod:latest
+        name: nginx
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    k8s-app: nginx
+  name: nginx
+  namespace: default
+spec:
+  ports:
+  - name: tcp-80-80-z9wl7
+    nodePort: 30369
+    port: 80
+    protocol: TCP
+    targetPort: 80
+  selector:
+    k8s-app: nginx
+  sessionAffinity: None
+  type: LoadBalancer
